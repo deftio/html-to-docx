@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to DOCX Export with Correct Image Embedding</title>
+    <link rel="icon" href="data:,">
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #content {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>HTML to DOCX Export Demo</h1>
+    <button id="exportButton">Export to DOCX</button>
+
+    <div id="content">
+        <h2>Main Title</h2>
+        <p id="datetime"></p>
+        <p>Introduction content under the main title.</p>
+        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="180" height="180" fill="#f0f0f0" stroke="#000000" stroke-width="2" />
+            <circle cx="100" cy="100" r="50" fill="#ff6347" stroke="#000000" stroke-width="2" />
+            <text x="100" y="100" font-family="Arial" font-size="16" fill="#000000" text-anchor="middle"
+                dominant-baseline="middle">SVG Test</text>
+        </svg>
+        <img src="./sample.jpeg" alt="Sample Image at Main Title">
+
+        <h3>Section 1</h3>
+        <p>This is content in Section 1.</p>
+        <img src="./sample.jpeg" alt="Sample Image in Section 1">
+
+        <div>
+            <h4>Subsection 1.1</h4>
+            <p>Details in Subsection 1.1.</p>
+
+            <img src="./sample.jpeg" alt="Sample Image in Subsection 1.1">
+
+            <div>
+                <h5>Sub-subsection 1.1.1</h5>
+                <p>More detailed content in Sub-subsection 1.1.1.</p>
+                <img src="./sample.jpeg" alt="Sample Image in Sub-subsection 1.1.1">
+            </div>
+
+            <h4>Subsection 1.2</h4>
+            <p>Details in Subsection 1.2.</p>
+        </div>
+
+        <h3>Section 2</h3>
+        <p>This is content in Section 2.</p>
+
+        <div>
+            <h4>Subsection 2.1</h4>
+            <p>Details in Subsection 2.1.</p>
+            <img src="./sample.jpeg" alt="Sample Image in Subsection 2.1">
+
+            <div>
+                <h5>Sub-subsection 2.1.1</h5>
+                <p>More detailed content in Sub-subsection 2.1.1.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate and insert the current date-time stamp
+        document.getElementById('datetime').textContent = `Generated on: ${new Date().toLocaleString()}`;
+
+        // Event listener for the export button
+        document.getElementById('exportButton').addEventListener('click', function (event) {
+            event.preventDefault();
+            const exportButton = document.getElementById('exportButton');
+            exportButton.textContent = "Export in Progress...";
+            exportButton.disabled = true;
+
+            const contentElement = document.getElementById('content');
+            exportHTMLDivToDocx(contentElement, 'exported-document.docx', {
+                creator: 'Your Name',
+                title: 'Exported Document',
+                description: 'A document generated from HTML content'
+            }, function () {
+                exportButton.textContent = "Export to DOCX";
+                exportButton.disabled = false;
+            });
+        });
+
+        async function exportHTMLDivToDocx(element, filename = "document.docx", metadata = {}, callback) {
+            let isExporting = false;
+
+            if (isExporting) {
+                console.log('Export already in progress');
+                return;
+            }
+
+            isExporting = true;
+
+            try {
+                // Process the HTML content first
+                const children = await processNode(element);
+
+                // Create the document after processing
+                const doc = new docx.Document({
+                    creator: metadata.creator || "Default Creator",
+                    title: metadata.title || "Document",
+                    description: metadata.description || "Document description",
+                    sections: [{
+                        properties: {},
+                        children: children
+                    }]
+                });
+
+                const blob = await docx.Packer.toBlob(doc);
+                saveAs(blob, filename);
+                console.log('Export completed successfully');
+            } catch (error) {
+                console.error('Error during DOCX creation:', error);
+            } finally {
+                isExporting = false;
+                if (callback) callback();
+            }
+        }
+
+        // Add this function to convert SVG to PNG
+        function svgToPng(svgElement) {
+            return new Promise((resolve, reject) => {
+                const svgString = new XMLSerializer().serializeToString(svgElement);
+                const svg = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svg);
+
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    canvas.toBlob(blob => {
+                        resolve(blob);
+                    }, 'image/png');
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error('Failed to load SVG'));
+                };
+                img.src = url;
+            });
+        }
+
+        async function processNode(node) {
+            const children = [];
+
+            for (let child of node.childNodes) {
+                switch (child.nodeType) {
+                    case Node.TEXT_NODE:
+                        if (child.textContent.trim()) {
+                            children.push(new docx.Paragraph(child.textContent.trim()));
+                        }
+                        break;
+                    case Node.ELEMENT_NODE:
+                        switch (child.tagName.toLowerCase()) {
+                            case 'h1':
+                                children.push(new docx.Paragraph({
+                                    text: child.textContent,
+                                    heading: docx.HeadingLevel.HEADING_1
+                                }));
+                                break;
+                            case 'h2':
+                                children.push(new docx.Paragraph({
+                                    text: child.textContent,
+                                    heading: docx.HeadingLevel.HEADING_2
+                                }));
+                                break;
+                            case 'h3':
+                                children.push(new docx.Paragraph({
+                                    text: child.textContent,
+                                    heading: docx.HeadingLevel.HEADING_3
+                                }));
+                                break;
+                            case 'h4':
+                                children.push(new docx.Paragraph({
+                                    text: child.textContent,
+                                    heading: docx.HeadingLevel.HEADING_4
+                                }));
+                                break;
+                            case 'h5':
+                                children.push(new docx.Paragraph({
+                                    text: child.textContent,
+                                    heading: docx.HeadingLevel.HEADING_5
+                                }));
+                                break;
+                            case 'p':
+                                children.push(new docx.Paragraph(child.textContent));
+                                break;
+                            case 'div':
+                                children.push(...await processNode(child));
+                                break;
+                            case 'img':
+                                try {
+                                    const fullImageUrl = new URL(child.src, window.location.href).href;
+                                    const response = await fetch(fullImageUrl);
+                                    const arrayBuffer = await response.arrayBuffer();
+
+                                    if (arrayBuffer.byteLength > 0) {
+                                        const uint8Array = new Uint8Array(arrayBuffer);
+
+                                        const paragraph = new docx.Paragraph({
+                                            children: [
+                                                new docx.ImageRun({
+                                                    data: uint8Array,
+                                                    transformation: {
+                                                        width: 400,
+                                                        height: 300
+                                                    },
+                                                    altText: child.alt
+                                                })
+                                            ]
+                                        });
+
+                                        children.push(paragraph);
+                                    } else {
+                                        console.error('Empty array buffer for image:', fullImageUrl);
+                                    }
+                                } catch (error) {
+                                    console.error('Image processing failed:', error);
+                                }
+                                break;
+                            case 'svg':
+                                try {
+                                    const pngBlob = await svgToPng(child);
+                                    const arrayBuffer = await pngBlob.arrayBuffer();
+
+                                    if (arrayBuffer.byteLength > 0) {
+                                        const uint8Array = new Uint8Array(arrayBuffer);
+
+                                        const paragraph = new docx.Paragraph({
+                                            children: [
+                                                new docx.ImageRun({
+                                                    data: uint8Array,
+                                                    transformation: {
+                                                        width: child.width.baseVal.value,
+                                                        height: child.height.baseVal.value
+                                                    },
+                                                    altText: 'Converted SVG'
+                                                })
+                                            ]
+                                        });
+
+                                        children.push(paragraph);
+                                    } else {
+                                        console.error('Empty array buffer for converted SVG');
+                                    }
+                                } catch (error) {
+                                    console.error('SVG processing failed:', error);
+                                }
+                                break;
+                            default:
+                                children.push(...await processNode(child));
+                                break;
+                        }
+                        break;
+                }
+            }
+
+            return children;
+        }
+    </script>
+</body>
+
+</html>
