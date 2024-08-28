@@ -30,8 +30,8 @@ To run this project, you need:
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/your-username/html-to-docx-exporter.git
-   cd html-to-docx-exporter
+   git clone github.com/deftio/html-to-docx.git
+   cd html-to-docx
    ```
 
 2. **Open `index.html` in a Browser**
