@@ -150,28 +150,27 @@
         function svgToPng(svgElement) {
             return new Promise((resolve, reject) => {
                 const svgString = new XMLSerializer().serializeToString(svgElement);
-                const svg = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-                const url = URL.createObjectURL(svg);
-
+                const canvas = document.createElement('canvas');
                 const img = new Image();
+
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(url);
                     canvas.toBlob(blob => {
                         resolve(blob);
                     }, 'image/png');
                 };
-                img.onerror = () => {
-                    URL.revokeObjectURL(url);
-                    reject(new Error('Failed to load SVG'));
-                };
-                img.src = url;
+
+                img.onerror = () => reject(new Error('Failed to convert SVG to PNG'));
+
+                // Create a data URL from the SVG string and set it as the source of the image
+                const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+                img.src = svgDataUrl;
             });
         }
+
 
         async function processNode(node) {
             const children = [];
