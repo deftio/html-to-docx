@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Docx Mini Version Test</title>
+    <script src="./dist/html-docx-mini.min.js"></script>
+</head>
+<body>
+    <h1>HTML Docx Mini Version Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        // Test version reporting
+        const output = document.getElementById('output');
+        
+        if (typeof HtmlDocxMini !== 'undefined') {
+            output.innerHTML = `
+                <h2>✅ HtmlDocxMini Loaded Successfully</h2>
+                <p><strong>Version:</strong> ${HtmlDocxMini.version || 'Not available'}</p>
+                <p><strong>VERSION:</strong> ${HtmlDocxMini.VERSION || 'Not available'}</p>
+                <p><strong>Version Info:</strong></p>
+                <pre>${JSON.stringify(HtmlDocxMini.versionInfo, null, 2)}</pre>
+                <p><strong>Available Methods:</strong></p>
+                <ul>
+                    ${Object.keys(HtmlDocxMini).map(key => `<li>${key}</li>`).join('')}
+                </ul>
+            `;
+            
+            // Log to console as well
+            console.log('HtmlDocxMini version:', HtmlDocxMini.version);
+            console.log('HtmlDocxMini VERSION:', HtmlDocxMini.VERSION);
+            console.log('HtmlDocxMini versionInfo:', HtmlDocxMini.versionInfo);
+            console.log('Full HtmlDocxMini object:', HtmlDocxMini);
+        } else {
+            output.innerHTML = '<h2>❌ HtmlDocxMini not loaded</h2>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "name": "html-docx-mini",
+  "version": "1.0.0",
+  "description": "Lightweight HTML to DOCX converter for browsers and Node.js with zero external dependencies",
+  "type": "module",
+  "main": "dist/html-docx-mini.cjs.js",
+  "module": "dist/html-docx-mini.esm.js",
+  "browser": "dist/html-docx-mini.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/html-docx-mini.esm.js",
+      "require": "./dist/html-docx-mini.cjs.js",
+      "browser": "./dist/html-docx-mini.min.js"
+    }
+  },
+  "scripts": {
+    "prebuild": "node scripts/generate-version.js",
+    "build": "rollup -c",
+    "dev": "node scripts/generate-version.js && rollup -c -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "version:generate": "node scripts/generate-version.js"
+  },
+  "keywords": [
+    "html",
+    "docx",
+    "word",
+    "export",
+    "converter",
+    "document",
+    "html-to-docx",
+    "html2docx",
+    "html-docx-mini",
+    "html-to-word"
+  ],
+  "author": "deftio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deftio/html-to-docx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deftio/html-to-docx/issues"
+  },
+  "homepage": "https://github.com/deftio/html-to-docx#readme",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "babel-jest": "^30.0.5",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
+    "jszip": "^3.10.1",
+    "rollup": "^4.46.2"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "file-saver": "^2.0.5"
+  }
+}

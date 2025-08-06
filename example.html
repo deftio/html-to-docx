@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Docx Mini - Example</title>
+    <script src="./dist/html-docx-mini.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #content {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9f9f9;
+        }
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML Docx Mini - Example Usage</h1>
+    
+    <div class="code-block">
+        <h3>Basic Usage:</h3>
+        <pre>
+// Select the HTML element to export
+const element = document.getElementById('content');
+
+// Export to DOCX
+HtmlDocxMini.exportHTMLDivToDocx(
+    element, 
+    'my-document.docx',
+    {
+        creator: 'Your Name',
+        title: 'Document Title',
+        description: 'Document Description'
+    }
+);
+        </pre>
+    </div>
+
+    <button id="exportBtn">Export Sample Content to DOCX</button>
+
+    <div id="content">
+        <h1>Sample Document</h1>
+        <p>This is a demonstration of the HTML to DOCX converter library.</p>
+        
+        <h2>Features</h2>
+        <ul>
+            <li>Converts HTML headings (h1-h6) to proper DOCX headings</li>
+            <li>Preserves paragraph formatting</li>
+            <li>Supports lists (ordered and unordered)</li>
+            <li>Handles images with automatic sizing</li>
+            <li>Converts SVG graphics to embedded images</li>
+        </ul>
+
+        <h2>Text Formatting</h2>
+        <p>The library processes various HTML elements and converts them to their DOCX equivalents. This includes paragraphs, headings, lists, and more.</p>
+
+        <h3>Subsection Example</h3>
+        <p>This is content within a subsection. The hierarchical structure of your HTML document is preserved in the exported DOCX file.</p>
+
+        <h2>Lists Example</h2>
+        <h3>Unordered List</h3>
+        <ul>
+            <li>First item</li>
+            <li>Second item</li>
+            <li>Third item</li>
+        </ul>
+
+        <h3>Ordered List</h3>
+        <ol>
+            <li>Step one</li>
+            <li>Step two</li>
+            <li>Step three</li>
+        </ol>
+
+        <h2>Graphics Support</h2>
+        <p>The library can handle both regular images and SVG graphics:</p>
+        
+        <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="130" height="130" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+            <circle cx="75" cy="75" r="40" fill="#1976d2"/>
+            <text x="75" y="80" font-family="Arial" font-size="14" fill="white" text-anchor="middle">SVG</text>
+        </svg>
+
+        <p>This SVG graphic will be converted to a PNG image and embedded in the DOCX file.</p>
+    </div>
+
+    <script>
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const button = this;
+            button.textContent = 'Exporting...';
+            button.disabled = true;
+
+            const contentElement = document.getElementById('content');
+            
+            HtmlDocxMini.exportHTMLDivToDocx(
+                contentElement, 
+                'sample-document.docx',
+                {
+                    creator: 'HTML Docx Mini',
+                    title: 'Sample Document',
+                    description: 'A sample document demonstrating the HTML to DOCX conversion'
+                },
+                function() {
+                    button.textContent = 'Export Sample Content to DOCX';
+                    button.disabled = false;
+                }
+            );
+        });
+    </script>
+</body>
+</html>
