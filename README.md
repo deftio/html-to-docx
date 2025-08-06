@@ -2,6 +2,8 @@
 
 This project is a simple web-based tool for exporting HTML content, including images and SVGs, to a DOCX file. It leverages the `docx` JavaScript library and allows you to generate a Word document from structured HTML content, with support for various elements like headings, paragraphs, images, and SVG graphics.
 
+[Live Demo Here](https://deftio.github.io/html-to-docx/docx.html)
+
 ## Features
 
 - **Export HTML to DOCX**: Convert an HTML structure into a DOCX file with proper formatting.
